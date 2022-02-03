@@ -446,7 +446,8 @@ C++</li>
 Visual Studio 2019<br>
 Effekseer<br>
 3DSMax<br>
-Adobe Photoshop Elements</li>
+Adobe Photoshop Elements<br>
+RenderDoc</li>
 <li>
 <h3 id="%E4%BD%BF%E7%94%A8%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA">使用ライブラリ</h3>
 DirectXTK</li>
@@ -1017,23 +1018,28 @@ http://nijikarasu.cocolog-nifty.com/blog/2014/10/post-b840.html</p>
 <p><br></br></p>
 <p><a id = 'MotionBlur'></a></p>
 <h2 id="iv-%E3%83%A2%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%83%96%E3%83%A9%E3%83%BC">iv. <strong>モーションブラー</strong></h2>
-<p>ゲーム画面にスピード感を持たせたかったため、モーションブラーを実装しました。特にカメラを振った時や、プレイヤーと敵がすれ違う時に現れます。<br>
-モデル描画時にベロシティマップを作成します。1フレーム前のビュープロジェクション行列と現在のビュープロジェクション行列、1フレーム前のワールド座標行列をもちいて、シェーダー内で1フレーム前のワールド座標と現在のワールド座標を計算し、その差をテクスチャとして書き出します。<br>
+<p>ゲーム画面にスピード感を持たせたかったため、モーションブラーを実装しました。特にカメラを振った時や、プレイヤーと敵がすれ違う時に現れます。</p>
+<p><img src="https://user-images.githubusercontent.com/54493763/152328131-55bff12e-8d70-47da-902b-b4e71d9da723.png" alt="MotionBlur"></p>
+<p>モデル描画時にベロシティマップを作成します。1フレーム前のビュープロジェクション行列と現在のビュープロジェクション行列、1フレーム前のワールド座標行列をもちいて、シェーダー内で1フレーム前のスクリーン座標と現在のスクリーン座標を計算し、その差をテクスチャとして書き出します。<br>
 作成過程を以下に記します。</p>
+<p><img src="https://user-images.githubusercontent.com/54493763/152345978-35314055-c35c-4e32-a350-4b7d43e0cb38.png" alt="intro"></p>
 <p>1.ベロシティマップの作成<br>
 i)モデル定数バッファにワールド座標の逆行列、1フレーム前のプロジェクションビュー行列、同行列の逆行列、1フレーム前のワールド座標の行列を設定する。<br>
-ii)頂点シェーダー内で現在のワールド座標と1フレーム前のワールド座標を計算する。<br>
+ii)頂点シェーダー内で現在のスクリーン座標と1フレーム前のスクリーン座標を計算する。<br>
 iii)ピクセルシェーダー内でモデルのスクリーン上の1フレーム前の座標と現在の座標を計算する。</p>
-<pre class="hljs"><code><div>float4 prevVPosInScreen = mul(prevViewProjMatrix, float4(psIn.prevWorldPos, 1.0f));  
+<pre class="hljs"><code><div>float4 prevPosInScreen = mul(prevViewProjMatrix, float4(psIn.prevWorldPos, 1.0f));  
 float4 currentPosInScreen = mul(currentViewProjMatrix,float4(psIn.worldPos.xyz, 1.0f));  
 </div></code></pre>
 <p>iv).両方の座標の差を計算し、速度を求めベロシティマップに書き込む。</p>
 <pre class="hljs"><code><div>float4 Velocity = currentPosInScreen - prevPosInScreen;  
 </div></code></pre>
-<p>2.ゲーム画面にブラーを掛ける<br>
-3.速度に応じてブラーを適用するピクセルを決定する<br>
-作成したベロシティマップを参照し、速度をサンプリングする。<br>
-速度がある場合、ブラー画像をサンプリングする際速度分ずらして色を取得する。</p>
+<p><img src="https://user-images.githubusercontent.com/54493763/152345979-d609e75f-d186-4055-883e-193887ba5dec.png" alt="conversion"><br>
+<br><br></p>
+<p>実際に作成したベロシティマップの各要素が下記の通り確認できました。<br>
+<img src="https://user-images.githubusercontent.com/54493763/152353358-8c55a8b6-b8fb-421f-89d3-d2af01dd36c5.png" alt="compare"></p>
+<p>2.速度とその向き応じてピクセルに色を加算する<br>
+作成したベロシティマップを参照し、速度をサンプリングします。<br>
+速度がある場合、その向きに向かってサンプリングする際のUV座標をずらして色を取得します。</p>
 <pre class="hljs"><code><div>float4 velocity = velocityMap.Sample(Sampler, uv);
 for (int i = 0; i &lt; SamplingNum; i++)
 {        
@@ -1041,6 +1047,8 @@ for (int i = 0; i &lt; SamplingNum; i++)
 }    
 finalColor.w = 1.0f;
 </div></code></pre>
+<img src="https://user-images.githubusercontent.com/54493763/152354516-6ddff47d-8a00-4425-a983-33e9c42994b6.png" width="49.5%">   
+<img src="https://user-images.githubusercontent.com/54493763/152354528-86bd7265-46ee-4193-9114-3c2a7abe3015.png" width="49.5%">   
 <hr>
 <p>参考URL<br>
 https://hikita12312.hatenablog.com/entry/2017/12/21/212641</p>

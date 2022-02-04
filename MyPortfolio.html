@@ -983,6 +983,9 @@ http://kanamori.cs.tsukuba.ac.jp/lecture/old2017/cg_basics/03/03_slides.pdf
 <p><img src="https://user-images.githubusercontent.com/54493763/152274443-d12191c5-c973-4639-9cd0-df3ccbe08df7.png" alt="Sun_low"></p>
 <p>2.ゴースト表現のためにブラーを掛ける。</p>
 <p><img src="https://user-images.githubusercontent.com/54493763/152274450-c45db659-7d0c-49d8-bcef-63e0e9c2b8f6.png" alt="Sun_blur"></p>
+<p>レンズゴーストが発生する場所の条件が以下の画像です。<br>
+輝度の高い物体（太陽）から画像の中心へ向かうように発生します。</p>
+<p><img src="https://user-images.githubusercontent.com/54493763/152492646-c6ee86ff-32c1-4090-bdfc-5fa15c66057b.png" alt="explain"></p>
 <p>3.全てのピクセルに対して以下の処理をおこなう。<br>
 i)対象ピクセルからUV座標の中心(0.5f,0.5f)へ向かう線分ベクトルを作成する。（P.1)<br>
 ii)線分を短くする。（今回は1/8）<br>
